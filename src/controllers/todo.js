@@ -1,7 +1,5 @@
 import mongoose from "mongoose";
 import Todo from "../models/todo";
-import Event from "../models/event";
-import User from "../models/user";
 import ProblemError from "../util/ProblemError";
 import {
   NO_TODO_FOUND,

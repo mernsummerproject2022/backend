@@ -20,7 +20,7 @@ const EventSchema = new Schema({
   },
   repeatEvery: {
     type: Date, 
-    required: true
+    required: false
   },
   duration: {
     type: Number, 
@@ -47,12 +47,11 @@ const EventSchema = new Schema({
   owner: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    //here true
-    required: false
+    required: true
   },
   eventType: {
-    type: String,
-    enum: ['football', 'basketball', 'tennis', 'volleyball', 'rugby', 'cycling', 'swimming', 'badminton', 'skiing', 'bowling'],
+    type: Schema.Types.ObjectId,
+    ref: 'Type',
     required: true
   }, 
 invites: [{

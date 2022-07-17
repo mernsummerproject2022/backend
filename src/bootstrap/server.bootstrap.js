@@ -5,7 +5,7 @@ import * as OpenApiValidator from "express-openapi-validator";
 import swaggerDocument from "../../swagger/spec.yaml";
 import errorMiddleware from "../middleware/errorMiddleware";
 import healthRouter from "../routes/health";
-import todoRouter from "../routes/todo";
+import eventRouter from "../routes/events";
 
 export class Server {
   app = null;
@@ -32,7 +32,7 @@ export class Server {
 
     //  Declaring API routes
     this.app.use("/health", healthRouter);
-    this.app.use("/todo", todoRouter);
+    this.app.use("/events", eventRouter);
 
     //  Error handling
     this.app.use(errorMiddleware);
