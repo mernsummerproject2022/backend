@@ -5,7 +5,9 @@ import * as OpenApiValidator from "express-openapi-validator";
 import swaggerDocument from "../../swagger/spec.yaml";
 import errorMiddleware from "../middleware/errorMiddleware";
 import healthRouter from "../routes/health";
-import todoRouter from "../routes/todo";
+import eventRouter from "../routes/events";
+import userRouter from "../routes/user";
+
 
 export class Server {
   app = null;
@@ -16,26 +18,28 @@ export class Server {
     this.app.use(express.json());
     this.app.use(cors());
 
-    const IS_NOT_PRODUCTION = process.env.NODE_ENV !== "production";
-    if (IS_NOT_PRODUCTION) {
-      this.app.use("/docs", serve, setup(swaggerDocument));
-    }
+   
+    // const IS_NOT_PRODUCTION = process.env.NODE_ENV !== "production";
+    // if (IS_NOT_PRODUCTION) {
+    //   this.app.use("/docs", serve, setup(swaggerDocument));
+    // }
 
-    //  Swagger error validator
-    this.app.use(
-      OpenApiValidator.middleware({
-        apiSpec: swaggerDocument,
-        validateRequests: true,
-        validateResponses: true
-      })
-    );
+    // //  Swagger error validator
+    // this.app.use(
+    //   OpenApiValidator.middleware({
+    //     apiSpec: swaggerDocument,
+    //     validateRequests: true,
+    //     validateResponses: true
+    //   })
+    // );
 
     //  Declaring API routes
     this.app.use("/health", healthRouter);
-    this.app.use("/todo", todoRouter);
+    this.app.use("/events", eventRouter);
+    this.app.use("/user", userRouter);
 
     //  Error handling
-    this.app.use(errorMiddleware);
+    // this.app.use(errorMiddleware);
   }
   listen(port) {
     this.app.listen(port, () => {
