@@ -5,7 +5,7 @@ import Invite from "../models/invite";
 import Type from "../models/eventype";
 import ProblemError from "../util/ProblemError";
 import {
-  
+
 } from "../util/errors";
 import { MESSAGE_TYPES } from "../util/constants";
 import { ObjectId } from "mongodb";
@@ -89,7 +89,8 @@ export const getEvent = async (_req, res, next) => {
     
 };
 
-export const postRequest = async (_req, res, next) => {
+export const putRequest = async (req, res, next) => {
+    
     
 };
 

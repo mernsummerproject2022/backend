@@ -4,7 +4,7 @@ import {
     getMyEvents,
     postEvent,
     getEvent,
-    postRequest,
+    putRequest,
     postInvite
   } from "../controllers/events";
 
@@ -16,7 +16,7 @@ eventRouter.get("/my/:id", getMyEvents);
 eventRouter.post("/my/", postEvent);
 
 eventRouter.get("/view/:id", getEvent);
-eventRouter.post("/view/request/", postRequest);
+eventRouter.put("/view/request/", putRequest);
 eventRouter.post("/view/invite/", postInvite);
 
 export default eventRouter;

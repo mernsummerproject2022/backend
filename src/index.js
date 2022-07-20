@@ -5,6 +5,7 @@ const port = process.env.PORT || 3001;
 const database = new Database();
 const server = new Server();
 
+require("dotenv").config();
 database.bootstrap();
 server.bootstrap();
 
