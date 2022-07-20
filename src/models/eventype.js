@@ -13,4 +13,3 @@ const Type = mongoose.model("eventype", TypeSchema);
 
 //Export model
 module.exports = Type;
-
