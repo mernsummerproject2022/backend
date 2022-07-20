@@ -6,11 +6,8 @@ import swaggerDocument from "../../swagger/spec.yaml";
 import errorMiddleware from "../middleware/errorMiddleware";
 import healthRouter from "../routes/health";
 import eventRouter from "../routes/events";
-<<<<<<< HEAD
-=======
 import userRouter from "../routes/user";
 
->>>>>>> a19682fd5d2873c0a2466325791679ed91a98920
 
 export class Server {
   app = null;
@@ -39,10 +36,7 @@ export class Server {
     //  Declaring API routes
     this.app.use("/health", healthRouter);
     this.app.use("/events", eventRouter);
-<<<<<<< HEAD
-=======
     this.app.use("/user", userRouter);
->>>>>>> a19682fd5d2873c0a2466325791679ed91a98920
 
     //  Error handling
     // this.app.use(errorMiddleware);
