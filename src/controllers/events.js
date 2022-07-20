@@ -37,7 +37,12 @@ export const getEvent = async (_req, res, next) => {
     
 };
 
+<<<<<<< HEAD
 export const postRequest = async (_req, res, next) => {
+=======
+export const putRequest = async (req, res, next) => {
+    
+>>>>>>> a19682fd5d2873c0a2466325791679ed91a98920
     
 };
 
