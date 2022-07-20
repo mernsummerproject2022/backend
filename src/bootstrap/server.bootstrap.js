@@ -22,13 +22,13 @@ export class Server {
     }
 
     //  Swagger error validator
-    this.app.use(
+    /*this.app.use(
       OpenApiValidator.middleware({
         apiSpec: swaggerDocument,
         validateRequests: true,
         validateResponses: true
       })
-    );
+    );*/
 
     //  Declaring API routes
     this.app.use("/health", healthRouter);

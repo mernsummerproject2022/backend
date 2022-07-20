@@ -1,12 +1,19 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const InviteSchema = new Schema({
-    user: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+const UserSchema = new Schema({
+    email: {
+      type: String,
+      required: true
     },
+    password: {
+      type: String,
+      required: false
+    }
+});
+
+const InviteSchema = new Schema({
+    user: UserSchema,
     accepted: {
         type: Boolean,
         default: false,
