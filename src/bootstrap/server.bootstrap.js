@@ -9,6 +9,7 @@ import eventRouter from "../routes/events";
 import userRouter from "../routes/user";
 import myRouter from "../routes/my";
 import viewRouter from "../routes/view";
+import inviteRouter from "../routes/invite";
 
 
 export class Server {
@@ -41,6 +42,7 @@ export class Server {
     this.app.use("/user", userRouter);
     this.app.use("/my", myRouter);
     this.app.use("/view", viewRouter);
+    this.app.use("/invite", inviteRouter);
 
     //  Error handling
     // this.app.use(errorMiddleware);

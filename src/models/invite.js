@@ -10,6 +10,11 @@ const InviteSchema = new Schema({
         type: Boolean,
         default: false,
         required: true
+    },
+    declined: {
+        type: Boolean,
+        default: false,
+        required: true
     }
 });
 

@@ -7,7 +7,7 @@ const server = new Server();
 
 require("dotenv").config();
 database.bootstrap();
-server.bootstrap(); cd
+server.bootstrap(); 
 
 //  Starting the server
 server.listen(port);

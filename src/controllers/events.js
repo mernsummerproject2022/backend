@@ -100,7 +100,7 @@ export const postInvite = async (req, res, next) => {
     const email = invite.user;
     console.log(email);
 
-    const newInvite = new Invite({accepted: false, user: {email: email}});    
+    const newInvite = new Invite({accepted: false, declined: false, user: {email: email}});    
    
     await Event.findOneAndUpdate({_id: new ObjectId(invite.event)}, {$push: { invites: [newInvite] }});
 
