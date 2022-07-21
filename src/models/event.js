@@ -1,77 +1,35 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+const UserModule = require("../models/user");
+const UserSchema = UserModule.UserSchema;
+const InviteModule = require("../models/invite");
+const InviteSchema = InviteModule.InviteSchema;
+const TypeModule = require("../models/eventype");
+const TypeSchema = TypeModule.TypeSchema;
+
 const EventSchema = new Schema({
-  name: {
-    type: String,
-    required: true
-  },
-  description: {
-    type: String,
-    required: true
-  },
-  dateTime: {
-    type: Date,
-    required: true
-  },
-  deadline: {
-    type: Date,
-    required: true
-  },
-  repeatEvery: {
-    type: Date, 
-    required: false
-  },
-  duration: {
-    type: Number, 
-    required: true
-  },
-  maxPlayers: {
-    type: Number, 
-    required: true
-  },
+  name: String,
+  description: String,
+  dateTime: Date,
+  deadline: Date,
+  repeatEvery: Date,
+  duration: Number,
+  maxPlayers: Number,
   location: {
-    name: {
-      type: String,
-      required: true
-    },
-    lat: {
-      type: Number,
-      required: false
-    },
-    long: {
-      type: Number,
-      required: false
-    }
+    name: String,
+    lat: Number,
+    long: Number
   },
-  owner: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
-  eventType: {
-    type: Schema.Types.ObjectId,
-    ref: 'Type',
-    required: true
-  }, 
-invites: [{
-  invite: {
-    type: Schema.Types.ObjectId,
-    ref: 'Invite'
-  }
-}],
-reserveInvites: [{
-    type: Schema.Types.ObjectId,
-    ref: 'User'
-}],
-requests: [{
-  type: Schema.Types.ObjectId,
-  ref: 'User'
-}],
+  owner: UserSchema,
+  eventType: TypeSchema, 
+  invites: [InviteSchema],
+  reserveInvites: [UserSchema],
+  requests: [UserSchema],
 });
 
 // Create model
 const Event = mongoose.model("event", EventSchema);
 
 //Export model
-module.exports = Event;
+module.exports = {Event, EventSchema};

@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-import User from "../models/user";
+const UserModule = require("../models/user");
+const User = UserModule.User;
 import jwt from "jsonwebtoken";
 import ProblemError from "../util/ProblemError";
 import {

@@ -1,10 +1,13 @@
 import mongoose from "mongoose";
-import Event from "../models/event";
-import User from "../models/user";
 import ProblemError from "../util/ProblemError";
 import {
 } from "../util/errors";
 import { MESSAGE_TYPES } from "../util/constants";
+const EventModule = require("../models/event");
+const Event = EventModule.Event;
+const InviteModule = require("../models/invite");
+const Invite = InviteModule.Invite;
+import { ObjectId } from "mongodb";
 
 // get all events from the DB
 export const getAllEvents = async (_req, res, next) => {

@@ -7,6 +7,8 @@ import errorMiddleware from "../middleware/errorMiddleware";
 import healthRouter from "../routes/health";
 import eventRouter from "../routes/events";
 import userRouter from "../routes/user";
+import myRouter from "../routes/my";
+import viewRouter from "../routes/view";
 
 
 export class Server {
@@ -37,6 +39,8 @@ export class Server {
     this.app.use("/health", healthRouter);
     this.app.use("/events", eventRouter);
     this.app.use("/user", userRouter);
+    this.app.use("/my", myRouter);
+    this.app.use("/view", viewRouter);
 
     //  Error handling
     // this.app.use(errorMiddleware);

@@ -1,12 +1,11 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+const UserModule = require("../models/user");
+const UserSchema = UserModule.UserSchema;
+
 const InviteSchema = new Schema({
-    user: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
+    user: UserSchema,
     accepted: {
         type: Boolean,
         default: false,
@@ -18,4 +17,4 @@ const InviteSchema = new Schema({
 const Invite = mongoose.model("invite", InviteSchema);
 
 //Export model
-module.exports = Invite;
+module.exports = {Invite, InviteSchema};
