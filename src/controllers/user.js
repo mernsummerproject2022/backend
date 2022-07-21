@@ -1,16 +1,17 @@
 import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
+
 const UserModule = require("../models/user");
 const User = UserModule.User;
-import jwt from "jsonwebtoken";
+
 import ProblemError from "../util/ProblemError";
 import {
   NO_TODO_FOUND,
   NO_MESSAGE_PROVIDED,
   INCORRECT_ID
 } from "../util/errors";
-import { MESSAGE_TYPES } from "../util/constants";
-
+import { MESSAGE_TYPES} from "../util/constants";
+import {hashPassword , comparePassword } from "../util/hashPassword";
+import tokenGenerator from "../util/tokenGenerator";
 
 
 export const postUserSignup = async (req, res, next) => {
@@ -30,10 +31,10 @@ export const postUserSignup = async (req, res, next) => {
       "Passwords do not match",
       "Passwords do not match"
     );
-  password = await bcrypt.hash(password, 10);
+  password = await hashPassword(password);
   const user = new User({
-    email,
-    password
+    email:email,
+    password:password
   });
   try {
     const newUser = await user.save();
@@ -61,7 +62,7 @@ export const postUserLogin = async (req, res, next) => {
         "User not found",
         "User not found"
       );
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch =  await comparePassword(password, user.password);
     if (!isMatch)
       throw new ProblemError(
         MESSAGE_TYPES.ERROR,
@@ -69,9 +70,7 @@ export const postUserLogin = async (req, res, next) => {
         "Incorrect password",
         "Incorrect password"
       );
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h"
-    });
+    const token = tokenGenerator(user._id);
     return res.status(200).send({ token });
   } catch (error) {
     next(error);
