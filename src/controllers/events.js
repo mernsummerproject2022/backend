@@ -4,83 +4,48 @@ import {
 
 } from "../util/errors";
 import { MESSAGE_TYPES } from "../util/constants";
+import {INCORRECT_ID} from "../util/errors"
+import { ValidId, ownerEvents, allEvents, oneEvent, addInvite, addEvent, addRequest } from "../util/databaseOperations";
 
-const EventModule = require("../models/event");
-const Event = EventModule.Event;
-const InviteModule = require("../models/invite");
-const Invite = InviteModule.Invite;
-
-import { ObjectId } from "mongodb";
-
-// get all events from the DB
-export const getAllEvents = async (_req, res, next) => {
+// get all events from the DB || events owner by userid
+export const getAllEvents = async (req, res, next) => {
   try {
-    const events = await Event.find({}).select({ "name": 1,"description": 1,"dateTime": 1,"location": 1,"maxPlayers": 1, "owner": 1, "eventType": 1});
+    const param = req.params.userid;
+    var events;
+
+    if(typeof param !== 'undefined') {
+      if (!ValidId(param)) {
+        throw new ProblemError(
+          
+        );
+      }
+
+      events = await ownerEvents(param);
+
+      if (!events) {
+        throw new ProblemError(
+          
+        );
+      }
+    } else {
+      events = await allEvents();
+
       if (!events.length)
         throw new ProblemError(
           
         );
+    }
       return res.status(200).send(events);
     } catch (error) {
       next(error);
     }
 };
 
-// get events created by a user with given id
-export const getMyEvents = async (req, res, next) => {
-  try {
-    const id = req.params.id;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new ProblemError(
-        
-      );
-    }
-
-    const objectId = new ObjectId(id);
-    const events = await Event.find({ 'owner._id': objectId });
-    if (!events) {
-      throw new ProblemError(
-        
-      );
-    }
-    return res.status(200).send(events);
-  } catch (error) {
-    next(error);
-  }
-};
-
 // save an event
 export const postEvent = async (req, res, next) => {
   try {
     const event = req.body;
-
-    const eType = event.eventType; 
-    const email = event.owner.email; 
-    const id = new ObjectId(event.owner.id);
-
-    const newEvent = new Event({
-      name: event.name, 
-      description: event.description, 
-      dateTime: event.dateTime, 
-      deadline: event.deadline, 
-      repeatEvery: event.repeatEvery, 
-      duration: event.duration, 
-      maxPlayers: event.maxPlayers, 
-      location: {
-        name: event.location.name, 
-        lat: event.location.lat,
-        long: event.location.long,
-      },
-      invites: [],
-      reserveInvites:[],
-      requests: [],
-      eventType: {name: eType},
-      owner: {email: email, _id: id}
-    });
-
-    await newEvent.save(function(err){
-      if (err) console.log('Error saving event');
-  });
+    const newEvent = addEvent(event);
     return res.status(200).send(newEvent);
   } catch (error) {
     next(error);
@@ -90,14 +55,14 @@ export const postEvent = async (req, res, next) => {
 export const getEvent = async (req, res, next) => {
   try {
     const id = req.params.id;
-    if (!mongoose.Types.ObjectId.isValid(id))
+    if (!ValidId(id))
       throw new ProblemError(
         MESSAGE_TYPES.ERROR,
         400,
         INCORRECT_ID.TYPE,
         INCORRECT_ID.DETAILS
       );
-    const event = await Event.findById(id);
+    const event = await oneEvent(id);
     if (!event)
       throw new ProblemError(
         MESSAGE_TYPES.ERROR,
@@ -116,44 +81,29 @@ export const getEvent = async (req, res, next) => {
 export const putRequest = async (req, res, next) => {
   try {
     const request = req.body;
-    if (!mongoose.Types.ObjectId.isValid(request.id))
+    if (!ValidId(request.event))
       throw new ProblemError(
         MESSAGE_TYPES.ERROR,
         400,
         INCORRECT_ID.TYPE,
         INCORRECT_ID.DETAILS
       );
-    const event = await Event.findById(request.id);
-    if (!event)
-      throw new ProblemError(
-        MESSAGE_TYPES.ERROR,
-        404,
-        NO_TODO_FOUND.TYPE,
-        NO_TODO_FOUND.DETAILS
-      );
-    
-      event.requests.push(request.requests);
-   
-    const updatedEvent = await event.save();
+    const updatedEvent = await addRequest(request.event, request.user);
+
     return res.status(200).send(updatedEvent);
   } catch (error) {
     next(error);
   }   
-    
+
 };
 
 // update an event by adding a new invite to it
 export const postInvite = async (req, res, next) => {
   try {
     const invite = req.body;
-    const email = invite.user;
-    console.log(email);
+    const response = await addInvite(invite.event, invite.user);
 
-    const newInvite = new Invite({accepted: false, declined: false, user: {email: email}});    
-   
-    await Event.findOneAndUpdate({_id: new ObjectId(invite.event)}, {$push: { invites: [newInvite] }});
-
-    return res.status(200).send(newInvite);
+    return res.status(200).send(response);
   } catch (error) {
     next(error);
   }      

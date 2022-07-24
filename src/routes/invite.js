@@ -1,14 +1,14 @@
 import { Router } from "express";
 import {
-    acceptInvite,
-    declineInvite
+    setDeclined,
+    setAccepted
   } from "../controllers/invite";
 
 const inviteRouter = new Router();
 
 // params: event id & (unique) invite id 
 // subject to change
-inviteRouter.get("/accept/:event&:id", acceptInvite);
-inviteRouter.get("/decline/:event&:id", declineInvite);
+inviteRouter.get("/accept/:event/:id", setAccepted);
+inviteRouter.get("/decline/:event/:id", setDeclined);
 
 export default inviteRouter;
