@@ -1,20 +1,18 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const UserSchema = new Schema({
-    email: {
-      type: String,
-      required: true
-    },
-    password: {
-      type: String,
-      required: false
-    }
-});
+
+const UserModule = require("../models/user");
+const UserSchema = UserModule.UserSchema;
 
 const InviteSchema = new Schema({
     user: UserSchema,
     accepted: {
+        type: Boolean,
+        default: false,
+        required: true
+    },
+    declined: {
         type: Boolean,
         default: false,
         required: true
@@ -25,4 +23,4 @@ const InviteSchema = new Schema({
 const Invite = mongoose.model("invite", InviteSchema);
 
 //Export model
-module.exports = Invite;
+module.exports = {Invite, InviteSchema};

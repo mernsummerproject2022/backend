@@ -1,5 +1,8 @@
 import mongoose from "mongoose";
-import User from "../models/user";
+
+const UserModule = require("../models/user");
+const User = UserModule.User;
+
 import ProblemError from "../util/ProblemError";
 import {
   NO_TODO_FOUND,

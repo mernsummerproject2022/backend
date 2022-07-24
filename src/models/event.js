@@ -1,40 +1,23 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const UserSchema = new Schema({
-  email: {
-    type: String,
-    required: true
-  },
-  password: {
-    type: String,
-    required: false
-  }
-});
-
-const TypeSchema = new Schema({
-  name: String
-});
-
-const InviteSchema = new Schema({
-  user: UserSchema,
-  accepted: {
-      type: Boolean,
-      default: false,
-      required: true
-  }
-});
+const UserModule = require("../models/user");
+const UserSchema = UserModule.UserSchema;
+const InviteModule = require("../models/invite");
+const InviteSchema = InviteModule.InviteSchema;
+const TypeModule = require("../models/eventype");
+const TypeSchema = TypeModule.TypeSchema;
 
 const EventSchema = new Schema({
   name: String,
   description: String,
   dateTime: Date,
   deadline: Date,
-  repeatEvery:Date,
+  repeatEvery: Date,
   duration: Number,
   maxPlayers: Number,
   location: {
-    name:  String,
+    name: String,
     lat: Number,
     long: Number
   },
@@ -49,4 +32,4 @@ const EventSchema = new Schema({
 const Event = mongoose.model("event", EventSchema);
 
 //Export model
-module.exports = Event;
+module.exports = {Event, EventSchema};

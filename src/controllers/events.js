@@ -1,13 +1,15 @@
 import mongoose from "mongoose";
-import Event from "../models/event";
-import User from "../models/user";
-import Invite from "../models/invite";
-import Type from "../models/eventype";
 import ProblemError from "../util/ProblemError";
 import {
 
 } from "../util/errors";
 import { MESSAGE_TYPES } from "../util/constants";
+
+const EventModule = require("../models/event");
+const Event = EventModule.Event;
+const InviteModule = require("../models/invite");
+const Invite = InviteModule.Invite;
+
 import { ObjectId } from "mongodb";
 
 // get all events from the DB
@@ -147,7 +149,7 @@ export const postInvite = async (req, res, next) => {
     const email = invite.user;
     console.log(email);
 
-    const newInvite = new Invite({accepted: false, user: {email: email}});    
+    const newInvite = new Invite({accepted: false, declined: false, user: {email: email}});    
    
     await Event.findOneAndUpdate({_id: new ObjectId(invite.event)}, {$push: { invites: [newInvite] }});
 
