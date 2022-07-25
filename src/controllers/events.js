@@ -102,7 +102,6 @@ export const postInvite = async (req, res, next) => {
   try {
     const invite = req.body;
     const response = await addInvite(invite.event, invite.user);
-
     return res.status(200).send(response);
   } catch (error) {
     next(error);
