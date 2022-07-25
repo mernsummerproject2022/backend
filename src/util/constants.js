@@ -5,3 +5,5 @@ export const MESSAGE_TYPES = {
 };
 
 export const TOKEN_EXPIRES_IN = "1h";
+
+export const EVENT_SELECTOR = {"name": 1,"description": 1,"dateTime": 1,"location": 1,"maxPlayers": 1, "owner": 1, "eventType": 1};
