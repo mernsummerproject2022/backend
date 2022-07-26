@@ -1,25 +1,37 @@
-import mongoose from "mongoose";
 import ProblemError from "../util/ProblemError";
-import {
-} from "../util/errors";
+import { ERROR_CODES, INCORRECT_ID } from "../util/errors";
 import { MESSAGE_TYPES } from "../util/constants";
-
-import { acceptInvite, declineInvite } from "../util/databaseOperations";
+import { updateInviteStatus, ValidId } from "../database/databaseOperations";
 
 export const setAccepted = async (req, res, next) => {
     try {
-        const response = await acceptInvite(req.params.event, req.params.id);
-                return res.status(200).send(response);
-      } catch (error) {
+      if (!ValidId(req.params.event) || !ValidId(req.params.id))
+      throw new ProblemError(
+        MESSAGE_TYPES.ERROR,
+        ERROR_CODES.BAD_REQUEST,
+        INCORRECT_ID.TYPE,
+        INCORRECT_ID.DETAILS
+      );
+
+      const response = await updateInviteStatus(req.params.event, req.params.id, true);
+      return res.status(200).send(response);
+    } catch (error) {
         next(error);
       }
 };
 
 export const setDeclined = async (req, res, next) => {
     try {
-        const response = await declineInvite(req.params.event, req.params.id);
-                return res.status(200).send(response);
-      } catch (error) {
+      if (!ValidId(req.params.event) || !ValidId(req.params.id))
+      throw new ProblemError(
+        MESSAGE_TYPES.ERROR,
+        ERROR_CODES.BAD_REQUEST,
+        INCORRECT_ID.TYPE,
+        INCORRECT_ID.DETAILS
+      );
+      const response = await updateInviteStatus(req.params.event, req.params.id, false);
+      return res.status(200).send(response);
+    } catch (error) {
         next(error);
       }
 };

@@ -1,13 +1,13 @@
-import mongoose from "mongoose";
-
 const UserModule = require("../models/user");
 const User = UserModule.User;
 
 import ProblemError from "../util/ProblemError";
 import {
-  NO_TODO_FOUND,
-  NO_MESSAGE_PROVIDED,
-  INCORRECT_ID
+  NO_INPUT_PROVIDED,
+  ERROR_CODES,
+  NO_USER_FOUND,
+  INCORRECT_PASSWORD,
+  NOT_MATCHING
 } from "../util/errors";
 import { MESSAGE_TYPES} from "../util/constants";
 import {hashPassword , comparePassword } from "../util/hashPassword";
@@ -20,16 +20,16 @@ export const postUserSignup = async (req, res, next) => {
   if (!email || !password || !confirmPassword)
     throw new ProblemError(
       MESSAGE_TYPES.ERROR,
-      400,
-      NO_MESSAGE_PROVIDED.TYPE,
-      NO_MESSAGE_PROVIDED.DETAILS
+      ERROR_CODES.BAD_REQUEST,
+      NO_INPUT_PROVIDED.TYPE,
+      NO_INPUT_PROVIDED.DETAILS
     );
   if (password !== confirmPassword)
     throw new ProblemError(
       MESSAGE_TYPES.ERROR,
-      400,
-      "Passwords do not match",
-      "Passwords do not match"
+      ERROR_CODES.BAD_REQUEST,
+      NOT_MATCHING.TYPE,
+      NOT_MATCHING.DETAILS
     );
   password = await hashPassword(password);
   const user = new User({
@@ -49,26 +49,26 @@ export const postUserLogin = async (req, res, next) => {
   if (!email || !password)
     throw new ProblemError(
       MESSAGE_TYPES.ERROR,
-      400,
-      NO_MESSAGE_PROVIDED.TYPE,
-      NO_MESSAGE_PROVIDED.DETAILS
+      ERROR_CODES.BAD_REQUEST,
+      NO_INPUT_PROVIDED.TYPE,
+      NO_INPUT_PROVIDED.DETAILS
     );
   try {
     const user = await User.findOne({ email });
     if (!user)
       throw new ProblemError(
         MESSAGE_TYPES.ERROR,
-        404,
-        "User not found",
-        "User not found"
+        ERROR_CODES.NOT_FOUND,
+        NO_USER_FOUND.TYPE,
+        NO_USER_FOUND.DETAILS
       );
     const isMatch =  await comparePassword(password, user.password);
     if (!isMatch)
       throw new ProblemError(
         MESSAGE_TYPES.ERROR,
-        401,
-        "Incorrect password",
-        "Incorrect password"
+        ERROR_CODES.UNAUTHORIZED,
+        INCORRECT_PASSWORD.TYPE,
+        INCORRECT_PASSWORD.DETAILS
       );
     const token = tokenGenerator(user._id);
     return res.status(200).send({ token });

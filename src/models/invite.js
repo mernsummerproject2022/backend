@@ -8,13 +8,8 @@ const UserSchema = UserModule.UserSchema;
 const InviteSchema = new Schema({
     user: UserSchema,
     accepted: {
-        type: Boolean,
-        default: false,
-        required: true
-    },
-    declined: {
-        type: Boolean,
-        default: false,
+        type: String,
+        default: 'undefined',
         required: true
     }
 });
