@@ -1,11 +1,7 @@
-import mongoose from "mongoose";
 import ProblemError from "../util/ProblemError";
-import {
-
-} from "../util/errors";
 import { MESSAGE_TYPES } from "../util/constants";
-import {INCORRECT_ID} from "../util/errors"
-import { ValidId, ownerEvents, allEvents, oneEvent, addInvite, addEvent, addRequest } from "../util/databaseOperations";
+import { INCORRECT_ID, ERROR_CODES, NO_EVENT_FOUND } from "../util/errors"
+import { ValidId, ownerEvents, allEvents, oneEvent, addInvite, addEvent, addRequest } from "../database/databaseOperations";
 
 // get all events from the DB || events owner by userid
 export const getAllEvents = async (req, res, next) => {
@@ -14,27 +10,27 @@ export const getAllEvents = async (req, res, next) => {
     var events;
 
     if(typeof param !== 'undefined') {
-      if (!ValidId(param)) {
+      if (!ValidId(param)) 
         throw new ProblemError(
-          
+          MESSAGE_TYPES.ERROR,
+          ERROR_CODES.BAD_REQUEST,
+          INCORRECT_ID.TYPE,
+          INCORRECT_ID.DETAILS
         );
-      }
-
+      
       events = await ownerEvents(param);
-
-      if (!events) {
-        throw new ProblemError(
-          
-        );
-      }
     } else {
       events = await allEvents();
-
-      if (!events.length)
-        throw new ProblemError(
-          
-        );
     }
+
+    if (!events.length)
+        throw new ProblemError(
+          MESSAGE_TYPES.ERROR,
+          ERROR_CODES.NOT_FOUND,
+          NO_EVENT_FOUND.TYPE,
+          NO_EVENT_FOUND.DETAILS
+        );
+
       return res.status(200).send(events);
     } catch (error) {
       next(error);
@@ -58,7 +54,7 @@ export const getEvent = async (req, res, next) => {
     if (!ValidId(id))
       throw new ProblemError(
         MESSAGE_TYPES.ERROR,
-        400,
+        ERROR_CODES.BAD_REQUEST,
         INCORRECT_ID.TYPE,
         INCORRECT_ID.DETAILS
       );
@@ -66,9 +62,9 @@ export const getEvent = async (req, res, next) => {
     if (!event)
       throw new ProblemError(
         MESSAGE_TYPES.ERROR,
-        404,
-        NO_TODO_FOUND.TYPE,
-        NO_TODO_FOUND.DETAILS
+        ERROR_CODES.NOT_FOUND,
+        NO_EVENT_FOUND.TYPE,
+        NO_EVENT_FOUND.DETAILS
       );
     return res.status(200).send(event);
   } catch (error) {
@@ -84,7 +80,7 @@ export const putRequest = async (req, res, next) => {
     if (!ValidId(request.event))
       throw new ProblemError(
         MESSAGE_TYPES.ERROR,
-        400,
+        ERROR_CODES.BAD_REQUEST,
         INCORRECT_ID.TYPE,
         INCORRECT_ID.DETAILS
       );
@@ -101,6 +97,13 @@ export const putRequest = async (req, res, next) => {
 export const postInvite = async (req, res, next) => {
   try {
     const invite = req.body;
+    if (!ValidId(invite.event))
+      throw new ProblemError(
+        MESSAGE_TYPES.ERROR,
+        ERROR_CODES.BAD_REQUEST,
+        INCORRECT_ID.TYPE,
+        INCORRECT_ID.DETAILS
+      );
     const response = await addInvite(invite.event, invite.user);
     return res.status(200).send(response);
   } catch (error) {
