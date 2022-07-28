@@ -6,11 +6,19 @@ const EventModule = require("../models/event");
 const Event = EventModule.Event;
 const InviteModule = require("../models/invite");
 const Invite = InviteModule.Invite;
+const UserModule = require("../models/user");
+const User = UserModule.User;
 
 export function ValidId(param) {
     return mongoose.Types.ObjectId.isValid(param);
 }
 
+export async function userExists(email) {
+    return await User.findOne({ email });
+}
+export async function userIdExists(id) {
+    return await User.findOne({ _id: id });
+}
 export async function ownerEvents(ownerId) {
     const objectId = new ObjectId(ownerId);
     return await Event.find({ 'owner._id': objectId });

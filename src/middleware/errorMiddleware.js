@@ -1,11 +1,12 @@
 import { HttpError } from "express-openapi-validator/dist/framework/types";
 import { SWAGGER_ERROR } from "../util/errors";
+import {ERROR_CODES} from "../util/errors";
 
 /**
  * @description Express middleware to handle application errors
  */
 export default (err, _req, res, next) => {
-  const status = err.status || 500;
+  const status = err.status || ERROR_CODES.INTERNAL_SERVER_ERROR;
   let type = err.type || "error";
   let short = err.short || "error";
   let detail = err.detail || "Something unexpected happened";
