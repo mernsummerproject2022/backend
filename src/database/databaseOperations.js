@@ -25,9 +25,25 @@ export async function oneEvent(eventId) {
     return await Event.findById(objectId);
 }
 
-export async function addInvite(event, user) {
-    const newInvite = new Invite({accepted: 'undefined', user: {email: user}});    
-    return await Event.findOneAndUpdate({_id: new ObjectId(event)}, {$push: { invites: [newInvite] }}, {new: true});
+export async function addInvite(eventId, userEmail) {
+    const newInvite = new Invite({accepted: 'undefined', user: {email: userEmail}});    
+
+    const responseEvent = await Event.find({ _id: new ObjectId(eventId)},
+    {
+      invites: {
+        $elemMatch: {
+          "user.email": userEmail,
+        }
+      }
+  });
+
+  if(responseEvent.length){
+    if(responseEvent[0].invites[0]){
+      return "already invited";
+    }
+  }
+
+    return await Event.findOneAndUpdate({_id: new ObjectId(eventId)}, {$push: { invites: [newInvite] }}, {new: true});
 }
 
 export async function addRequest(event, user) {       
@@ -65,10 +81,10 @@ export function addEvent(event) {
 }
 
 export async function updateInviteStatus(eventId, inviteId, accept) {    
-  let responseMessage = "";
+  let responseMessage = "invite not found";
   let responsePayload = {};
 
-  const responseEvent = await Event.find({ _id: new ObjectId(eventId)},
+  const eventToUpdate = await Event.find({ _id: new ObjectId(eventId)},
     {
       invites: {
         $elemMatch: {
@@ -76,36 +92,43 @@ export async function updateInviteStatus(eventId, inviteId, accept) {
         }
       }
   });
+  const fullEvent = await Event.find({ _id: new ObjectId(eventId)});
 
-  if(responseEvent.length){
-    if(responseEvent[0].invites.length){
-      if(responseEvent[0].invites[0].accepted === 'declined') {
-        responseMessage = accept ? "declined" : "already declined";
-        responsePayload = {}
-      }
+  if(eventToUpdate.length){
+    if(eventToUpdate[0].invites.length){
+        if(eventToUpdate[0].invites[0].accepted === 'declined') {
+          responseMessage = accept ? "declined" : "already declined";
+          responsePayload = {}
+        }
 
-      if(responseEvent[0].invites[0].accepted === 'accepted') {
-        responseMessage = accept ? "already accepted" : "accepted";
-        responsePayload = {}
-      }
+        if(eventToUpdate[0].invites[0].accepted === 'accepted') {
+          responseMessage = accept ? "already accepted" : "accepted";
+          responsePayload = {}
+        }
 
-      if(responseEvent[0].invites[0].accepted === 'undefined') {
-        responseMessage = accept ? "accepted" : "declined";
-        responsePayload = await Event.findOneAndUpdate(
-          {
-            _id: new ObjectId(eventId),
-            'invites._id': inviteId,
-          },
-          {
-            $set: { 'invites.$.accepted': accept ? "accepted" : "declined" },
-          },
-          {
-            new: true,
-            runValidators: true,
-            useFindAndModify: false,
-          }
-        );   
-      }
+        if(eventToUpdate[0].invites[0].accepted === 'undefined') {
+          const deadline = new Date(fullEvent[0].deadline);
+          const now = new Date();
+          if(now <= deadline){
+            responseMessage = accept ? "accepted" : "declined";
+            responsePayload = await Event.findOneAndUpdate(
+              {
+                _id: new ObjectId(eventId),
+                'invites._id': inviteId,
+              },
+              {
+                $set: { 'invites.$.accepted': accept ? "accepted" : "declined" },
+              },
+              {
+                new: true,
+                runValidators: true,
+                useFindAndModify: false,
+              }
+            );   
+        } else {
+          responseMessage = "deadline exceeded";
+        }
+      } 
     }
   }
   return {message: responseMessage, payload: responsePayload};
