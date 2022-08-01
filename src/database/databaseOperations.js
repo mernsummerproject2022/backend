@@ -110,6 +110,14 @@ export async function updateInviteStatus(eventId, inviteId, accept) {
           const deadline = new Date(fullEvent[0].deadline);
           const now = new Date();
           if(now <= deadline){
+
+            var participants = 0;
+            fullEvent[0].invites.forEach(function(i) {
+              let acc = (i.accepted === 'accepted') ? 1 : 0;
+              participants = participants + acc;
+            })
+
+            if(participants < fullEvent[0].maxPlayers){
             responseMessage = accept ? "accepted" : "declined";
             responsePayload = await Event.findOneAndUpdate(
               {
@@ -125,6 +133,9 @@ export async function updateInviteStatus(eventId, inviteId, accept) {
                 useFindAndModify: false,
               }
             );   
+          } else {
+            responseMessage = "participants limit exceeded";
+          }
         } else {
           responseMessage = "deadline exceeded";
         }
