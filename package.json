@@ -31,6 +31,7 @@
     "node-pre-gyp": "^0.17.0",
     "request": "^2.79.0",
     "swagger-ui-express": "^4.3.0",
+    "validator": "^13.7.0",
     "yaml": "^1.10.2",
     "yaml-loader": "^0.6.0"
   },

@@ -5,7 +5,11 @@ const ERROR_TYPES = {
 };
 
 export const ERROR_CODES = {
+  INTERNAL_SERVER_ERROR: 500,
+  SUCCESS: 200,
+  CREATED: 201,
   NOT_FOUND: 404,
+  FORBIDDEN: 403,
   BAD_REQUEST: 400,
   UNAUTHORIZED: 401
 };
@@ -44,3 +48,18 @@ export const NOT_MATCHING = {
   TYPE: ERROR_TYPES.INCORRECT_DATA,
   DETAILS: "The passwords do not match"
 };
+
+export const WRONG_EMAIL_FORMAT = {
+  TYPE: ERROR_TYPES.INCORRECT_DATA,
+  DETAILS: "The email format is incorrect"
+}
+
+export const USER_ALREADY_EXISTS = {
+  TYPE: ERROR_TYPES.INCORRECT_DATA,
+  DETAILS: "The user already exists"
+}
+
+export const WRONG_DEADLINE= {
+  TYPE: ERROR_TYPES.INCORRECT_DATA,
+  DETAILS: "The deadline is incorrect"
+}

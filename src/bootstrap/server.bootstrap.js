@@ -6,7 +6,7 @@ import swaggerDocument from "../../swagger/spec.yaml";
 import errorMiddleware from "../middleware/errorMiddleware";
 import healthRouter from "../routes/health";
 import eventRouter from "../routes/events";
-import userRouter from "../routes/user";
+import userRouter from "../routes/auth";
 import viewRouter from "../routes/view";
 import inviteRouter from "../routes/invite";
 
@@ -43,8 +43,8 @@ export class Server {
     this.app.use("/view", viewRouter);
     this.app.use("/invite", inviteRouter);
 
-    //  Error handling
-    // this.app.use(errorMiddleware);
+    // Error handling
+    this.app.use(errorMiddleware);
   }
   listen(port) {
     this.app.listen(port, () => {
