@@ -50,20 +50,6 @@ export default async (req, res, next) => {
       );
     }
 
-    if (
-      !validator.isLength("" + password.toLowerCase().trim(), {
-        min: 8,
-        max: 15
-      })
-    ) {
-      throw new ProblemError(
-        MESSAGE_TYPES.ERROR,
-        ERROR_CODES.BAD_REQUEST,
-        NO_INPUT_PROVIDED.TYPE,
-        NO_INPUT_PROVIDED.DETAILS
-      );
-    }
-
     if (!validator.isAlphanumeric(password)) {
       throw new ProblemError(
         MESSAGE_TYPES.ERROR,

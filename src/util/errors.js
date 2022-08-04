@@ -34,7 +34,7 @@ export const NO_INPUT_PROVIDED = {
   DETAILS: "No input was provided"
 };
 export const PASSWORD_WRONG_FORMAT = {
-  TYPE: ERROR_TYPES.NOT_FOUND,
+  TYPE: ERROR_TYPES.INCORRECT_DATA,
   DETAILS: "Password must contain letters and numbers"
 };
 export const INCORRECT_ID = {
