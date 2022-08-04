@@ -16,6 +16,9 @@ export function ValidId(param) {
 export async function userExists(email) {
     return await User.findOne({ email });
 }
+export async function userId(email){
+    return await User.findOne({ email }).select("_id");
+}
 export async function userIdExists(id) {
     return await User.findOne({ _id: id });
 }

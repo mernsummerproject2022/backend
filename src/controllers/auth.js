@@ -5,6 +5,7 @@ import {
 } from "../util/errors";
 import { hashPassword} from "../util/hashPassword";
 import tokenGenerator from "../util/tokenGenerator";
+import { userId } from "../database/databaseOperations";
 
 export const postUserSignup = async (req, res, next) => {
     const { email, confirmPassword } = req.body;
@@ -21,7 +22,9 @@ export const postUserSignup = async (req, res, next) => {
 
 export const postUserLogin = async (req, res, next) => {
     const { email, password } = req.body;
+    const user= await userId(email);
     const payload = {
+      id : user,
       email: email
     };
     const token = tokenGenerator(payload);
