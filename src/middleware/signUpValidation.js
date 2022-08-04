@@ -5,7 +5,8 @@ import {
   USER_ALREADY_EXISTS,
   WRONG_EMAIL_FORMAT,
   NO_INPUT_PROVIDED,
-  NOT_MATCHING
+  NOT_MATCHING,
+  PASSWORD_WRONG_FORMAT
 } from "../util/errors";
 import ProblemError from "../util/ProblemError";
 import { MESSAGE_TYPES } from "../util/constants";
@@ -67,8 +68,8 @@ export default async (req, res, next) => {
       throw new ProblemError(
         MESSAGE_TYPES.ERROR,
         ERROR_CODES.BAD_REQUEST,
-        NO_INPUT_PROVIDED.TYPE,
-        NO_INPUT_PROVIDED.DETAILS
+        PASSWORD_WRONG_FORMAT.TYPE,
+        PASSWORD_WRONG_FORMAT.DETAILS
       );
     }
 
