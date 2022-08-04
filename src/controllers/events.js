@@ -1,7 +1,8 @@
 import ProblemError from "../util/ProblemError";
 import { MESSAGE_TYPES } from "../util/constants";
 import { INCORRECT_ID, ERROR_CODES, NO_EVENT_FOUND } from "../util/errors"
-import { ValidId, ownerEvents, allEvents, oneEvent, addInvite, addEvent, addRequest } from "../database/databaseOperations";
+import { ValidId, ownerEvents, allEvents, oneEvent, addInvite, addEvent, addRequest, markSent } from "../database/databaseOperations";
+import mailer from "../mailsender/mailer";
 
 // get all events from the DB || events owner by userid
 export const getAllEvents = async (req, res, next) => {
@@ -104,8 +105,15 @@ export const postInvite = async (req, res, next) => {
         INCORRECT_ID.TYPE,
         INCORRECT_ID.DETAILS
       );
-    const response = await addInvite(invite.event, invite.user);
-    return res.status(200).send(response);
+
+    const responseEvent = await addInvite(invite.event, invite.user);
+
+    if(typeof responseEvent !== 'string'){
+      const responseInvite = responseEvent.invites.find(i => i.user.email === invite.user);
+      mailer(responseEvent, responseInvite);    
+    }
+  
+    return res.status(200).send(responseEvent);
   } catch (error) {
     next(error);
   }      
