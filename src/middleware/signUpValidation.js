@@ -50,15 +50,6 @@ export default async (req, res, next) => {
       );
     }
 
-    if (!validator.isAlphanumeric(password)) {
-      throw new ProblemError(
-        MESSAGE_TYPES.ERROR,
-        ERROR_CODES.BAD_REQUEST,
-        PASSWORD_WRONG_FORMAT.TYPE,
-        PASSWORD_WRONG_FORMAT.DETAILS
-      );
-    }
-
     //check if a user with the same email already exists
     const user = await userExists(email);
     if (user) {
