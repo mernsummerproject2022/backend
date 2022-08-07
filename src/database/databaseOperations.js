@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
 import { ObjectId } from "mongodb";
 import { EVENT_SELECTOR } from "../util/constants";
+import ProblemError from "../util/ProblemError";
+import { MESSAGE_TYPES } from "../util/constants";
+import { ERROR_CODES, INCORRECT_ID } from "../util/errors";
 
 const EventModule = require("../models/event");
 const Event = EventModule.Event;
@@ -16,12 +19,26 @@ export function ValidId(param) {
 export async function userExists(email) {
   return await User.findOne({ email });
 }
-export async function userId(email){
+export async function userId(email) {
   return await User.findOne({ email }).select("_id");
 }
-export async function userIdExists(id) {
-  return await User.findOne({ _id: id });
+export async function userIdExists(eventId, userId) {
+  const find = await Event.find(
+    { _id: new ObjectId(eventId) },
+    {
+      invites: {
+        $elemMatch: {
+          _id: new ObjectId(userId)
+        }
+      }
+    }
+  );
+  return find;
 }
+export async function eventIdExists(id) {
+  return await Event.findOne({ _id: id });
+}
+
 export async function ownerEvents(ownerId) {
   const objectId = new ObjectId(ownerId);
   return await Event.find({ "owner._id": objectId });
@@ -63,9 +80,8 @@ export async function addInvite(eventId, userEmail) {
       }
     }
   );
-
   if (eventRequests.length) {
-    if (eventRequests[0].invites[0]) {
+    if (eventRequests[0].requests.length === 1) {
       //remove request
       await Event.updateOne(
         { _id: new ObjectId(eventId) },
@@ -75,7 +91,7 @@ export async function addInvite(eventId, userEmail) {
   }
 
   if (responseEvent.length) {
-    if (responseEvent[0].invites[0]) {
+    if (responseEvent[0].invites.length === 1) {
       return "already invited";
     }
   }
@@ -88,6 +104,36 @@ export async function addInvite(eventId, userEmail) {
 }
 
 export async function addRequest(event, user) {
+  const eventRequests = await Event.find(
+    { _id: new ObjectId(event) },
+    {
+      requests: {
+        $elemMatch: {
+          email: user
+        }
+      }
+    }
+  );
+  const eventInvite = await Event.find(
+    { _id: new ObjectId(event) },
+    {
+      invites: {
+        $elemMatch: {
+          "user.emai": user
+        }
+      }
+    }
+  );
+  if (eventRequests.length) {
+    if (eventRequests[0].requests.length === 1) {
+      return "already in list";
+    }
+  }
+  if (eventInvite.length) {
+    if (eventInvite[0].invites.length === 1) {
+      return "already in list";
+    }
+  }
   return await Event.findOneAndUpdate(
     { _id: new ObjectId(event) },
     { $push: { requests: [{ email: user }] } },
@@ -126,9 +172,6 @@ export function addEvent(event) {
 }
 
 export async function updateInviteStatus(eventId, inviteId, accept) {
-  let responseMessage = "invite not found";
-  let responsePayload = {};
-
   const eventToUpdate = await Event.find(
     { _id: new ObjectId(eventId) },
     {
@@ -144,13 +187,39 @@ export async function updateInviteStatus(eventId, inviteId, accept) {
   if (eventToUpdate.length) {
     if (eventToUpdate[0].invites.length) {
       if (eventToUpdate[0].invites[0].accepted === "declined") {
-        responseMessage = accept ? "declined" : "already declined";
-        responsePayload = {};
+        if (accept) {
+          throw new ProblemError(
+            MESSAGE_TYPES.ERROR,
+            ERROR_CODES.BAD_REQUEST,
+            "invite_error",
+            "Invite status is declined"
+          );
+        } else {
+          throw new ProblemError(
+            MESSAGE_TYPES.ERROR,
+            ERROR_CODES.BAD_REQUEST,
+            "invite_error",
+            "Invite is already declined"
+          );
+        }
       }
 
       if (eventToUpdate[0].invites[0].accepted === "accepted") {
-        responseMessage = accept ? "already accepted" : "accepted";
-        responsePayload = {};
+        if (accept) {
+          throw new ProblemError(
+            MESSAGE_TYPES.ERROR,
+            ERROR_CODES.BAD_REQUEST,
+            "invite_error",
+            "Invite is already accepted"
+          );
+        } else {
+          throw new ProblemError(
+            MESSAGE_TYPES.ERROR,
+            ERROR_CODES.BAD_REQUEST,
+            "invite_error",
+            "Invite status is accepted"
+          );
+        }
       }
 
       if (eventToUpdate[0].invites[0].accepted === "undefined") {
@@ -164,8 +233,7 @@ export async function updateInviteStatus(eventId, inviteId, accept) {
           });
 
           if (participants < fullEvent[0].maxPlayers) {
-            responseMessage = accept ? "accepted" : "declined";
-            responsePayload = await Event.findOneAndUpdate(
+            await Event.findOneAndUpdate(
               {
                 _id: new ObjectId(eventId),
                 "invites._id": inviteId
@@ -180,13 +248,22 @@ export async function updateInviteStatus(eventId, inviteId, accept) {
               }
             );
           } else {
-            responseMessage = "participants limit exceeded";
+            throw new ProblemError(
+              MESSAGE_TYPES.ERROR,
+              ERROR_CODES.BAD_REQUEST,
+              "invite_error",
+              "Participants limit reached"
+            );
           }
         } else {
-          responseMessage = "deadline exceeded";
+          throw new ProblemError(
+            MESSAGE_TYPES.ERROR,
+            ERROR_CODES.BAD_REQUEST,
+            "invite_error",
+            "Sorryy! Deadline exceeded :("
+          );
         }
       }
     }
   }
-  return { message: responseMessage, payload: responsePayload };
 }

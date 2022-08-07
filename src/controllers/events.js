@@ -1,7 +1,7 @@
 import ProblemError from "../util/ProblemError";
 import { MESSAGE_TYPES } from "../util/constants";
-import { INCORRECT_ID, ERROR_CODES, NO_EVENT_FOUND } from "../util/errors"
-import { ValidId, ownerEvents, allEvents, oneEvent, addInvite, addEvent, addRequest, markSent } from "../database/databaseOperations";
+import { INCORRECT_ID, ERROR_CODES, NO_EVENT_FOUND, INVITE_ALREADY_EXISTS, REQUEST_ALREADY_EXISTS } from "../util/errors"
+import { ValidId, ownerEvents, allEvents, oneEvent, addInvite, addEvent, addRequest, markSent, eventIdExists } from "../database/databaseOperations";
 import mailer from "../mailsender/mailer";
 
 // get all events from the DB || events owner by userid
@@ -86,10 +86,26 @@ export const putRequest = async (req, res, next) => {
         INCORRECT_ID.DETAILS
       );
     const updatedEvent = await addRequest(request.event, request.user);
-
+    if(typeof updatedEvent === 'string'){
+      throw new ProblemError(
+        MESSAGE_TYPES.ERROR,
+        ERROR_CODES.BAD_REQUEST,
+        REQUEST_ALREADY_EXISTS.TYPE,
+        REQUEST_ALREADY_EXISTS.DETAILS
+      );
+    }
+    if(updatedEvent === null){
+      throw new ProblemError(
+        MESSAGE_TYPES.ERROR,
+        ERROR_CODES.BAD_REQUEST,
+        INCORRECT_ID.TYPE,
+        INCORRECT_ID.DETAILS
+      );
+    }
     return res.status(200).send(updatedEvent);
   } catch (error) {
     next(error);
+    
   }   
 
 };
@@ -98,23 +114,33 @@ export const putRequest = async (req, res, next) => {
 export const postInvite = async (req, res, next) => {
   try {
     const invite = req.body;
-    if (!ValidId(invite.event))
+    if (!ValidId(invite.event)){
       throw new ProblemError(
         MESSAGE_TYPES.ERROR,
         ERROR_CODES.BAD_REQUEST,
         INCORRECT_ID.TYPE,
         INCORRECT_ID.DETAILS
       );
-
+    }
+      
     const responseEvent = await addInvite(invite.event, invite.user);
 
     if(typeof responseEvent !== 'string'){
       const responseInvite = responseEvent.invites.find(i => i.user.email === invite.user);
       mailer(responseEvent, responseInvite);    
     }
-  
+    else {
+      throw new ProblemError(
+        MESSAGE_TYPES.ERROR,
+        ERROR_CODES.BAD_REQUEST,
+        INVITE_ALREADY_EXISTS.TYPE,
+        INVITE_ALREADY_EXISTS.DETAILS
+      );
+    }
+    
     return res.status(200).send(responseEvent);
   } catch (error) {
+    console.log(error);
     next(error);
   }      
 };

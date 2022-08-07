@@ -59,7 +59,17 @@ export const USER_ALREADY_EXISTS = {
   DETAILS: "The user already exists"
 }
 
+export const INVITE_ALREADY_EXISTS = {
+  TYPE: ERROR_TYPES.INCORRECT_DATA,
+  DETAILS: "The invite already exists"
+}
+
 export const WRONG_DEADLINE= {
   TYPE: ERROR_TYPES.INCORRECT_DATA,
   DETAILS: "The deadline is incorrect"
+}
+
+export const REQUEST_ALREADY_EXISTS = {
+  TYPE: ERROR_TYPES.INCORRECT_DATA,
+  DETAILS: "Can't make request beacause you are on invites/requests list"
 }

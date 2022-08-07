@@ -67,7 +67,7 @@ export default async (req, res, next) => {
           );
     }
 
-    if (dateTime > deadline) {
+    if (dateTime < deadline) {
         throw new ProblemError(
             MESSAGE_TYPES.ERROR,
             ERROR_CODES.BAD_REQUEST,
