@@ -9,8 +9,8 @@ import verifyUser from "../middleware/auth";
 const viewRouter = new Router();
 
 viewRouter.get("/:id", getEvent);
+viewRouter.post("/request/", putRequest);
 viewRouter.use(verifyUser);
-viewRouter.put("/request/", putRequest);
 viewRouter.post("/invite/", postInvite);
 
 export default viewRouter;

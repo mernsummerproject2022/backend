@@ -16,7 +16,11 @@ export default (err, _req, res, next) => {
     type = SWAGGER_ERROR.TYPE;
     detail = `Request${err.errors[0].path} ${err.errors[0].message}`;
   }
-
+  if(short==="invite_error"){
+    return res.status(status).json({
+      "Error":detail
+    });
+  }
   return res.status(status).json({
     status,
     type,
